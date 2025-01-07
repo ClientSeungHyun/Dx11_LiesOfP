@@ -511,7 +511,7 @@ void CRaxasia::Start_CutScene(_uint iCutSceneNum)
 {
 	const _Matrix* pNewSocketMatrix = { nullptr };
 
-	//Effect_All_OFf();
+	Effect_All_Off();
 	m_vRimLightColor = { 0.f,0.f,0.f,0.f};
 
 	switch (iCutSceneNum)
@@ -1059,6 +1059,7 @@ HRESULT CRaxasia::Ready_Weapon()
 	Desc.pParentWorldMatrix = WeaponDesc.pParentWorldMatrix;
 	Desc.pSocketBoneMatrix2 = WeaponDesc.pParentWorldMatrix;
 	Desc.fDamageAmount = m_eStat.fAtk;
+	Desc.pOWner = this;
 
 	m_pKickCollObj = dynamic_cast<CColliderObject*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_ColliderObj"), &Desc));
 

@@ -75,6 +75,7 @@ HRESULT CUIPage_Loading::Render()
 void CUIPage_Loading::OpenAction()
 {
 	__super::OpenAction();
+	
 }
 
 void CUIPage_Loading::CloseAction()

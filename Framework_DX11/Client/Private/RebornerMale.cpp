@@ -91,6 +91,7 @@ HRESULT CRebornerMale::Initialize(void* pArg)
 
 	m_vCenterOffset = _Vec3{ 0.f, 1.78f, 0.f };
 
+	m_bHaveGrogy = false;
 	m_bDiscover = false;
 
 	// 24-11-26 ±è¼º¿ë
@@ -116,12 +117,6 @@ void CRebornerMale::Priority_Update(_float fTimeDelta)
 
 void CRebornerMale::Update(_float fTimeDelta)
 {
-	if (KEY_TAP(KEY::R))
-	{
-		CEffect_Manager::Get_Instance()->Add_Effect_ToLayer(LEVEL_GAMEPLAY, TEXT("Monster_Impact"),
-			_Vec3{ Calc_CenterPos() }, _Vec3{ 0, 0, 1 });
-	}
-
 	if (m_pGameInstance->Get_Player_AreaNum() == m_iInitRoomNum)
 		m_vCurRootMove = XMVector3TransformNormal(m_pModelCom->Play_Animation(fTimeDelta), m_pTransformCom->Get_WorldMatrix());
 	else
