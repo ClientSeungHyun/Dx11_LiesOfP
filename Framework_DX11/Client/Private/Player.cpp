@@ -157,18 +157,18 @@ HRESULT CPlayer::Initialize(void * pArg)
 	//m_pNavigationCom->Move_to_Cell(m_pRigidBodyCom, 228); // 계단 옆 별바라기
 	//m_pNavigationCom->Move_to_Cell(m_pRigidBodyCom, 1030); // 계단 옆 별바라기
 	//m_pNavigationCom->Move_to_Cell(m_pRigidBodyCom, 774); //긴사다리 위
-	m_pNavigationCom->Move_to_Cell(m_pRigidBodyCom, 772); //긴사다리
+	//m_pNavigationCom->Move_to_Cell(m_pRigidBodyCom, 772); //긴사다리
 	//m_pNavigationCom->Move_to_Cell(m_pRigidBodyCom, 427); //짧은사다리
 	//m_pNavigationCom->Move_to_Cell(m_pRigidBodyCom, 341); //아래엘베
 	//m_pNavigationCom->Move_to_Cell(m_pRigidBodyCom, 440); //상자랑 장애물
 	//m_pNavigationCom->Move_to_Cell(m_pRigidBodyCom, 1066); // 순간이동 1066
 	//m_pNavigationCom->Move_to_Cell(m_pRigidBodyCom, 790); // 순간이동 790
 	//m_pNavigationCom->Move_to_Cell(m_pRigidBodyCom, 801); // 소피아 방
-	m_pNavigationCom->Move_to_Cell(m_pRigidBodyCom, 1178); // 소피아 방 내부
+	//m_pNavigationCom->Move_to_Cell(m_pRigidBodyCom, 1178); // 소피아 방 내부
 	//m_pNavigationCom->Move_to_Cell(m_pRigidBodyCom, 0); 
-	m_pNavigationCom->Move_to_Cell(m_pRigidBodyCom, 268); // 락사시아 보스전
+	//m_pNavigationCom->Move_to_Cell(m_pRigidBodyCom, 268); // 락사시아 보스전
 	//m_pNavigationCom->Move_to_Cell(m_pRigidBodyCom, 1333); // 튜토리얼
-	//m_pNavigationCom->Move_to_Cell(m_pRigidBodyCom, 307); // 위에 엘베
+	m_pNavigationCom->Move_to_Cell(m_pRigidBodyCom, 307); // 위에 엘베
 	//튜토리얼 끝나고 순간이동 후  y축 -120도 회전
 
 	m_iRespawn_Cell_Num = 772;
@@ -295,7 +295,7 @@ void CPlayer::Update(_float fTimeDelta)
 	if (KEY_TAP(KEY::K))
 	{
 		//Init_PlayerCamera();
-		Calc_DebuffGain(DEBUFF_ELEC, 30.f);
+		Calc_DebuffGain(DEBUFF_FIRE, 30.f);
 		//Change_State(RAPIER_FATAL);
 	}
 
@@ -1183,6 +1183,7 @@ void CPlayer::Damaged(_float fAtkDmg)
 	_float fFinalDmg = fAtkDmg - (fAtkDmg * ((m_tPlayer_Stat->iStat_Defence + m_tPlayer_Stat_Adjust->iStat_Defence) / 4000.f));
 
 	m_tPlayer_Stat->vGauge_Hp.x = max(0.f, m_tPlayer_Stat->vGauge_Hp.x - fFinalDmg);
+
 	if(m_tPlayer_Stat->vGauge_Hp.y - m_tPlayer_Stat->vGauge_Hp.x > 100.f)
 		m_tPlayer_Stat->vGauge_Hp.y = max(m_tPlayer_Stat->vGauge_Hp.x, m_tPlayer_Stat->vGauge_Hp.y - fFinalDmg);
 
@@ -1395,6 +1396,16 @@ void CPlayer::Decrease_Arm(_float fAmount)
 {
 	m_fRecoveryArmTime = 5.f;
 	m_vGuage_Arm.x = max(0.f, m_vGuage_Arm.x - fAmount);
+}
+
+void CPlayer::Recovery_All()
+{
+	m_tPlayer_Stat->vGauge_Hp.x = m_tPlayer_Stat->vGauge_Hp.z + m_tPlayer_Stat_Adjust->vGauge_Hp.z;
+	m_tPlayer_Stat->vGauge_Hp.y = m_tPlayer_Stat->vGauge_Hp.x;
+	m_tPlayer_Stat->vGauge_Region.x = m_tPlayer_Stat->vGauge_Region.z;
+	m_tPlayer_Stat->vGauge_Stamina.x = m_tPlayer_Stat->vGauge_Stamina.z + m_tPlayer_Stat_Adjust->vGauge_Stamina.z;
+	Use_DebuffResetItem();
+	GET_GAMEINTERFACE->Add_Durable_Weapon(100.f);
 }
 
 void CPlayer::On_DissolveEffect(_uint iIndex, _bool bOn)
@@ -1619,6 +1630,7 @@ void CPlayer::CollisionStay_IntercObj(CGameObject* pGameObject)
 		{
 			if (GET_GAMEINTERFACE->Action_InterAction(TEXT("별바라기를 사용한다")))
 			{
+				Recovery_All();
 				GET_GAMEINTERFACE->Set_Potion_Count_Full();
 				GET_GAMEINTERFACE->Show_Script_Npc_Talking(NPC_SCRIPT::SCR_STARGAZER, 0); // 별바라기 화면 열기 
 				GET_GAMEINTERFACE->Set_Now_Interact_Stargezer(pStargazer->Get_CellNum());

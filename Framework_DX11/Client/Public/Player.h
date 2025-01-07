@@ -98,6 +98,10 @@ public:
 			fDebuff_Fire = { 0.f,0.f };
 			fDebuff_Electric = { 0.f,0.f };
 			fDebuff_Acid = { 0.f,0.f };
+
+			 fResist_Fire = 0.f;
+			 fResist_Electric = 0.f;
+			 fResist_Acid = 0.f;
 		};
 
 		// 유저 레벨 
@@ -313,6 +317,7 @@ public:
 	void			Recovery_HP(_float fAmount);
 	void			Recovery_HP_Hit(_float fAmount);
 	void			Decrease_Arm(_float fAmount = 0.1f);
+	void			Recovery_All();
 
 	class CStargazer* Find_Stargazer(_int iCellNumber = -1);
 
