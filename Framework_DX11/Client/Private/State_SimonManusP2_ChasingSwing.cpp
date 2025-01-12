@@ -128,7 +128,7 @@ void CState_SimonManusP2_ChasingSwing::Collider_Check(_double CurTrackPos)
     {
         if ((CurTrackPos >= 140.f))
         {
-            m_pMonster->Active_CurrentWeaponCollider(1.2f, 0, HIT_TYPE::HIT_METAL, ATTACK_STRENGTH::ATK_WEAK);
+            m_pMonster->Active_CurrentWeaponCollider(1.2f, 0, HIT_TYPE::HIT_METAL, ATTACK_STRENGTH::ATK_NORMAL);
         }
         else
         {
@@ -174,6 +174,7 @@ void CState_SimonManusP2_ChasingSwing::Effect_Check(_double CurTrackPos)
             if (!m_bSwing)
             {
                 m_pMonster->Active_Effect(CSimonManus::P2_TRAIL);
+                m_pMonster->DeActive_Effect(CSimonManus::SWING_DRAG);
                 m_pMonster->Active_Effect(CSimonManus::SWING_DRAG_REVERSE);
                 m_bSwing = true;
             }
@@ -181,6 +182,7 @@ void CState_SimonManusP2_ChasingSwing::Effect_Check(_double CurTrackPos)
         else
         {
             m_pMonster->DeActive_Effect(CSimonManus::P2_TRAIL);
+            m_pMonster->DeActive_Effect(CSimonManus::SWING_DRAG);
             m_pMonster->DeActive_Effect(CSimonManus::SWING_DRAG_REVERSE);
         }
     }
@@ -188,17 +190,17 @@ void CState_SimonManusP2_ChasingSwing::Effect_Check(_double CurTrackPos)
 
 void CState_SimonManusP2_ChasingSwing::Control_Sound(_double CurTrackPos)
 {
-    if (!m_bStampSound)
-    {
-        if (CurTrackPos >= 35.f)
-        {
-            m_pMonster->Play_Sound(CPawn::PAWN_SOUND_EFFECT1, TEXT("SE_NPC_SK_FX_Ground_Exp_L_03.wav"));
-            m_bStampSound = true;
-        }
-    }
-
     if (m_iRouteTrack == 0)
     {
+        if (!m_bStampSound)
+        {
+            if (CurTrackPos >= 100.f)
+            {
+                m_pMonster->Play_Sound(CPawn::PAWN_SOUND_EFFECT1, TEXT("SE_NPC_SK_FX_Ground_Exp_L_03.wav"));
+                m_bStampSound = true;
+            }
+        }
+
         if (!m_bSwingSound)
         {
             if (CurTrackPos >= 140.f && CurTrackPos <= 145.f)
@@ -216,7 +218,7 @@ void CState_SimonManusP2_ChasingSwing::Control_Sound(_double CurTrackPos)
     {
         if (!m_bSwingSound)
         {
-            if (CurTrackPos >= 100.f)
+            if (CurTrackPos >= 30.f)
             {
                 m_pMonster->Play_Sound(CPawn::PAWN_SOUND_EFFECT1, TEXT("SE_PC_SK_Smash_Crystal_Stone_H_03.wav"));
                 m_bSwingSound = true;

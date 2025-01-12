@@ -167,7 +167,7 @@ void CState_SimonManusP2_Route1::Collider_Check(_float fTimeDelta, _double CurTr
     {
         if (CurTrackPos >= 120 && CurTrackPos <= 180.f)
         {
-            m_pMonster->Active_CurrentWeaponCollider(1.f, 0, HIT_TYPE::HIT_METAL, ATTACK_STRENGTH::ATK_WEAK);
+            m_pMonster->Active_CurrentWeaponCollider(1.f, 0, HIT_TYPE::HIT_METAL, ATTACK_STRENGTH::ATK_NORMAL);
         }
         else
         {
@@ -178,7 +178,7 @@ void CState_SimonManusP2_Route1::Collider_Check(_float fTimeDelta, _double CurTr
     {
         if (CurTrackPos >= 60 && CurTrackPos <= 75.f)
         {
-            m_pMonster->Active_CurrentWeaponCollider(1.1f, 0, HIT_TYPE::HIT_METAL, ATTACK_STRENGTH::ATK_WEAK);
+            m_pMonster->Active_CurrentWeaponCollider(1.1f, 0, HIT_TYPE::HIT_METAL, ATTACK_STRENGTH::ATK_NORMAL);
         }
         else
         {
@@ -225,7 +225,7 @@ void CState_SimonManusP2_Route1::Effect_Check(_double CurTrackPos)
     }
     else       //½ºÅÆÇÁ
     {
-        if (CurTrackPos >= 60 && CurTrackPos <= 75.f)
+        if (CurTrackPos >= 75 && CurTrackPos <= 80.f)
         {
             if (!m_bStampEffect)
             {
@@ -275,7 +275,7 @@ void CState_SimonManusP2_Route1::Control_Sound(_double CurTrackPos)
     {
         if (!m_bStampSound)
         {
-            if (CurTrackPos >= 160 && CurTrackPos <= 165.f)
+            if (CurTrackPos >= 60 && CurTrackPos <= 165.f)
             {
                 m_pMonster->Play_Sound(CPawn::PAWN_SOUND_EFFECT1, TEXT("SE_NPC_SK_FX_Ground_Exp_L_03.wav"));
 

@@ -2,7 +2,7 @@
 #include "AObj_Stomp.h"
 
 #include "GameInstance.h"
-#include "Pawn.h"
+#include "Player.h"
 
 #include "Effect_Manager.h"
 
@@ -38,8 +38,8 @@ HRESULT CAObj_Stomp::Initialize(void* pArg)
     m_pOwner = pDesc->pOwner;
     Safe_AddRef(m_pOwner);
 
-    m_fDamageAmount = 270.f;
-    m_fLifeDuration = 0.2f;
+    m_fDamageAmount = 240.f;
+    m_fLifeDuration = 0.1f;
     m_pColliderCom->IsActive(true);
 
     m_strObjectTag = TEXT("MonsterWeapon");
@@ -54,14 +54,13 @@ void CAObj_Stomp::Priority_Update(_float fTimeDelta)
 
 void CAObj_Stomp::Update(_float fTimeDelta)
 {
-    //if (m_fLifeTime >= m_fLifeDuration)
-    //{
-    //    m_isDead = true;
-    //}
-    //else
-    //{
-    //    m_fLifeTime += fTimeDelta;
-    //}
+    if (m_fLifeTime >= m_fLifeDuration)
+    {
+    }
+    else
+    {
+        m_fLifeTime += fTimeDelta;
+    }
 
     if (m_pEffect->Get_Dead())
     {
@@ -129,7 +128,15 @@ void CAObj_Stomp::OnCollisionEnter(CGameObject* pOther)
         if (!bOverlapCheck)
         {
             m_DamagedObjects.push_back(pOther);
-            pOther->Calc_DamageGain(m_fDamageAmount * m_fDamageRatio, _Vec3{}, HIT_TYPE::HIT_METAL, ATTACK_STRENGTH::ATK_STRONG);
+            _bool bHitCheck = pOther->Calc_DamageGain(m_fDamageAmount * m_fDamageRatio, _Vec3{}, HIT_TYPE::HIT_METAL, ATTACK_STRENGTH::ATK_STRONG);
+
+            CPlayer* pPlayer = static_cast<CPlayer*>(pOther);
+
+            if (bHitCheck && !pPlayer->Get_IsInvicible())
+            {
+                CEffect_Manager::Get_Instance()->Add_Effect_ToLayer(LEVEL_GAMEPLAY, TEXT("Player_Impact"),
+                    _Vec3{ pOther->Get_Transform()->Get_State(CTransform::STATE_POSITION) + _Vec3{0.f, 1.f, 0.f} }, _Vec3{ 0.f, -1.f, 0.f });
+            }
         }
     }
 }

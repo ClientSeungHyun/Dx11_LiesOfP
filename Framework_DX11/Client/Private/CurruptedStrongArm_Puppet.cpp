@@ -95,6 +95,11 @@ void CCurruptedStrongArm_Puppet::Priority_Update(_float fTimeDelta)
 {
 	__super::Priority_Update(fTimeDelta);
 
+	for (_uint i = 0; i < TYPE_END; ++i)
+	{
+		m_pColliderObject[i]->Priority_Update(fTimeDelta);
+	}
+
 	for (auto& Effect : m_SurfaceEffect)
 		Effect->Priority_Update(fTimeDelta);
 
@@ -118,6 +123,11 @@ void CCurruptedStrongArm_Puppet::Update(_float fTimeDelta)
 	
 	Update_Collider();
 	Update_Debuff(fTimeDelta);
+
+	for (_uint i = 0; i < TYPE_END; ++i)
+	{
+		m_pColliderObject[i]->Update(fTimeDelta);
+	}
 
 	for (_uint i = 0; i < PAWN_SOUND_END; ++i)
 	{
@@ -210,6 +220,8 @@ void CCurruptedStrongArm_Puppet::Resetting()
 	Change_State(CMonster::IDLE);
 
 	GET_GAMEINTERFACE->Set_OnOff_OrthoUI(false, this);
+
+	m_pRigidBodyCom->Add_Actor();
 }
 
 void CCurruptedStrongArm_Puppet::Active_CurrentWeaponCollider(_float fDamageRatio, _uint iCollIndex, HIT_TYPE eHitType, ATTACK_STRENGTH eAtkStrength)
@@ -392,7 +404,7 @@ HRESULT CCurruptedStrongArm_Puppet::Ready_Components()
 	physX::GeometryCapsule CapsuleDesc;
 	CapsuleDesc.fHeight = 1.5f;
 	CapsuleDesc.fRadius = 0.85f;
-	RigidBodyDesc.pGeometry = &CapsuleDesc;
+	RigidBodyDesc.pGeometryDesc = &CapsuleDesc;
 	RigidBodyDesc.PxLockFlags = PxRigidDynamicLockFlag::eLOCK_ANGULAR_X |
 		PxRigidDynamicLockFlag::eLOCK_ANGULAR_Y |
 		PxRigidDynamicLockFlag::eLOCK_ANGULAR_Z;

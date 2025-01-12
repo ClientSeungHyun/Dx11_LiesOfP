@@ -63,7 +63,7 @@ HRESULT CCarcassTail::Initialize(void* pArg)
 	m_eStat.fGrogyPoint = 0.f;
 	m_eStat.fMaxGrogyPoint = 210.f;
 
-	m_iKnockBackResist = 5.f;
+	m_iKnockBackResist = 5;
 	m_iErgoPoint = 400;
 
 	m_pTransformCom->LookAt(_vector{ 0, 0, -1, 0 });
@@ -103,6 +103,11 @@ void CCarcassTail::Priority_Update(_float fTimeDelta)
 {
 	__super::Priority_Update(fTimeDelta);
 
+	for (_uint i = 0; i < TYPE_END; ++i)
+	{
+		m_pColliderObject[i]->Priority_Update(fTimeDelta);
+	}
+
 	for (auto& Effect : m_SurfaceEffect)
 		Effect->Priority_Update(fTimeDelta);
 
@@ -134,6 +139,11 @@ void CCarcassTail::Update(_float fTimeDelta)
 
 	Update_Collider();
 	Update_Debuff(fTimeDelta);
+
+	for (_uint i = 0; i < TYPE_END; ++i)
+	{
+		m_pColliderObject[i]->Update(fTimeDelta);
+	}
 }
 
 void CCarcassTail::Late_Update(_float fTimeDelta)
@@ -211,6 +221,8 @@ void CCarcassTail::Resetting()
 	Change_State(CMonster::IDLE);
 
 	GET_GAMEINTERFACE->Set_OnOff_OrthoUI(false, this);
+
+	m_pRigidBodyCom->Add_Actor();
 }
 
 void CCarcassTail::On_PowerAttack(_bool bOn)
@@ -429,7 +441,7 @@ HRESULT CCarcassTail::Ready_Components()
 	physX::GeometryCapsule CapsuleDesc;
 	CapsuleDesc.fHeight = 1.f;
 	CapsuleDesc.fRadius = 1.f;
-	RigidBodyDesc.pGeometry = &CapsuleDesc;
+	RigidBodyDesc.pGeometryDesc = &CapsuleDesc;
 
 	/* FOR.Com_RigidBody */
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_RigidBody"),

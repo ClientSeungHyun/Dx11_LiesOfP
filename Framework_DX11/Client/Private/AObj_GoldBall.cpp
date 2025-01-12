@@ -79,16 +79,15 @@ void CAObj_GoldBall::Update(_float fTimeDelta)
             m_pEffect->Set_Loop(false);
             m_bDelCheck = true;
         }
-        if (m_pEffect->Get_Dead())
-        {
-            m_isDead = true;
-        }
-
-
     }
     else
     {
         m_fLifeTime += fTimeDelta;
+    }
+
+    if (m_pEffect->Get_Dead())
+    {
+        m_isDead = true;
     }
 
     //¿òÁ÷ÀÓ
@@ -160,8 +159,8 @@ void CAObj_GoldBall::OnCollisionEnter(CGameObject* pOther)
 
             CEffect_Manager::Get_Instance()->Add_Effect_ToLayer(LEVEL_GAMEPLAY, TEXT("SimonManus_Attack_GoldBall_Impact"),
                 _Vec3{ m_pTransformCom->Get_State(CTransform::STATE_POSITION) }, _Vec3{ m_pTransformCom->Get_State(CTransform::STATE_LOOK) });
+            m_pEffect->Set_Loop(false);
         }
-        m_pEffect->Set_Loop(false);
     }
 }
 

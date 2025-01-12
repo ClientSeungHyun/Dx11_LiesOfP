@@ -4,7 +4,7 @@
 #include "GameInstance.h"
 
 #include "Effect_Manager.h"
-#include "Pawn.h"
+#include "Player.h"
 
 #include "EffectObject.h"
 
@@ -43,7 +43,7 @@ HRESULT CAObj_Bullet::Initialize(void* pArg)
 
     m_fDamageAmount = 40.f;
     m_fLifeDuration = 2.5f;
-    m_fSpeed = 60.f;
+    m_fSpeed = 55.f;
     //m_fSpeed = 0.5f;
     m_pColliderCom->IsActive(true);
 
@@ -154,13 +154,18 @@ void CAObj_Bullet::OnCollisionEnter(CGameObject* pOther)
         if (!bOverlapCheck)
         {
             m_DamagedObjects.push_back(pOther);
-            pOther->Calc_DamageGain(m_fDamageAmount * m_fDamageRatio, _Vec3{}, HIT_TYPE::HIT_METAL, ATTACK_STRENGTH::ATK_WEAK);
+            _bool bHitCheck = pOther->Calc_DamageGain(m_fDamageAmount * m_fDamageRatio, _Vec3{}, HIT_TYPE::HIT_METAL, ATTACK_STRENGTH::ATK_WEAK);
             m_isDead = true;
 
-            //CEffect_Manager::Get_Instance()->Add_Effect_ToLayer(LEVEL_GAMEPLAY, TEXT("SimonManus_Attack_GoldBall_Impact"),
-            //    _Vec3{ m_pTransformCom->Get_State(CTransform::STATE_POSITION) }, _Vec3{ m_pTransformCom->Get_State(CTransform::STATE_LOOK) });
+            CPlayer* pPlayer = static_cast<CPlayer*>(pOther);
+
+            if (bHitCheck && !pPlayer->Get_IsInvicible())
+            {
+                CEffect_Manager::Get_Instance()->Add_Effect_ToLayer(LEVEL_GAMEPLAY, TEXT("Player_Impact"),
+                    _Vec3{ pOther->Get_Transform()->Get_State(CTransform::STATE_POSITION) + _Vec3{0.f, 1.f, 0.f} }, m_vMoveDir);
+            }
+            m_pEffect->Set_Loop(false);
         }
-        m_pEffect->Set_Loop(false);
     }
 }
 
@@ -179,7 +184,7 @@ HRESULT CAObj_Bullet::Ready_Components()
 
     /* FOR.Com_Collider */
     CBounding_OBB::BOUNDING_OBB_DESC      ColliderDesc{};
-    ColliderDesc.vExtents = _float3(0.1f, 0.1f, 0.5f);
+    ColliderDesc.vExtents = _float3(0.12f, 0.12f, 0.7f);
     ColliderDesc.vCenter = _float3(0.f, 0.f, -0.15f);
     ColliderDesc.vAngles = _float3(0.f, 0.f, 0.f);
 

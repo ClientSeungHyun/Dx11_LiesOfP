@@ -162,12 +162,12 @@ HRESULT CPlayer::Initialize(void * pArg)
 	//m_pNavigationCom->Move_to_Cell(m_pRigidBodyCom, 341); //아래엘베
 	//m_pNavigationCom->Move_to_Cell(m_pRigidBodyCom, 440); //상자랑 장애물
 	//m_pNavigationCom->Move_to_Cell(m_pRigidBodyCom, 1066); // 순간이동 1066
-	//m_pNavigationCom->Move_to_Cell(m_pRigidBodyCom, 790); // 순간이동 790
+	m_pNavigationCom->Move_to_Cell(m_pRigidBodyCom, 790); // 순간이동 790
 	//m_pNavigationCom->Move_to_Cell(m_pRigidBodyCom, 801); // 소피아 방
 	//m_pNavigationCom->Move_to_Cell(m_pRigidBodyCom, 1178); // 소피아 방 내부
 	//m_pNavigationCom->Move_to_Cell(m_pRigidBodyCom, 0); 
 	//m_pNavigationCom->Move_to_Cell(m_pRigidBodyCom, 268); // 락사시아 보스전
-	m_pNavigationCom->Move_to_Cell(m_pRigidBodyCom, 1333); // 튜토리얼
+	//m_pNavigationCom->Move_to_Cell(m_pRigidBodyCom, 1333); // 튜토리얼
 	//m_pNavigationCom->Move_to_Cell(m_pRigidBodyCom, 307); // 위에 엘베
 	//튜토리얼 끝나고 순간이동 후  y축 -120도 회전
 
@@ -185,8 +185,8 @@ HRESULT CPlayer::Initialize(void * pArg)
 
 	m_vRimLightColor = _Vec4(0.f, 0.f, 0.f, 0.f);
 
-	GET_GAMEINTERFACE->Start_Tutorial_Talking(); // 제미니 대화부터 시작하는 함수, Start_Tutorial 함수를 쓰면 대화 없이 바로 튜토리얼 진행 
-
+	//GET_GAMEINTERFACE->Start_Tutorial_Talking(); // 제미니 대화부터 시작하는 함수, Start_Tutorial 함수를 쓰면 대화 없이 바로 튜토리얼 진행 
+	
 	return S_OK;
 }
 
@@ -234,6 +234,11 @@ void CPlayer::Priority_Update(_float fTimeDelta)
 	for (auto& pEffect : m_DissolveEffects)
 	{
 		pEffect->Priority_Update(fTimeDelta);
+	}
+
+	if (Key_Tab(KEY::B))
+	{
+		m_tPlayer_Stat_Adjust->iErgo = -2320;
 	}
 }
 
@@ -287,40 +292,6 @@ void CPlayer::Update(_float fTimeDelta)
 	Active_CutScene(fTimeDelta);
 	Active_Sophia_Dead_Talk(fTimeDelta);
 
-#pragma region 디버그 확인용
-	if (KEY_TAP(KEY::L))
-	{
-		Change_State(RAPIER_PARRYATTACK);
-	}
-	if (KEY_TAP(KEY::K))
-	{
-		//Init_PlayerCamera();
-		Calc_DebuffGain(DEBUFF_FIRE, 30.f);
-		//Change_State(RAPIER_FATAL);
-	}
-
-
-
-
-	if (KEY_TAP(KEY::Q))
-	{
-		/*for (_uint i = 0; i < 30; ++i)
-		{
-			_Vec3 vPlayerPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-			vPlayerPos.x += m_pGameInstance->Get_Random(-1.f, 1.f);
-			vPlayerPos.z += m_pGameInstance->Get_Random(-1.f, 1.f);
-
-			CObjectPool<CDecal_Blood>::Get_GameObject()->Active_Random(vPlayerPos);
-		}
-
-		Calc_DebuffGain(DEBUFF_ACID, 10.f);
-
-		CEffect_Manager::Get_Instance()->Add_Effect_ToLayer(LEVEL_GAMEPLAY, TEXT("Player_KillSophia"), (_Vec3)m_pTransformCom->Get_State(CTransform::STATE_POSITION));*/
-		GET_GAMEINTERFACE->Show_Script_Npc_Talking(NPC_SCRIPT::SCR_SOPIA_DIE);
-		//dynamic_cast<CCutScene*>(m_pGameInstance->Find_Object(LEVEL_GAMEPLAY, TEXT("Layer_CutScene"), SOPHIA_DEAD))->Start_Play();
-		//Change_State(FLAME_FATAL);
-	}
-#pragma endregion
 }
 
 void CPlayer::Late_Update(_float fTimeDelta)
@@ -383,9 +354,9 @@ HRESULT CPlayer::Render_LightDepth()
 	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Bind_Matrices("g_CascadeViewMatrix", m_pGameInstance->Get_CascadeViewMatirx(), 3)))
+	if (FAILED(m_pShaderCom->Bind_Matrices("g_CascadeViewMatrix", m_pGameInstance->Get_CascadeViewMatrices(), 3)))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_Matrices("g_CascadeProjMatrix", m_pGameInstance->Get_CascadeProjMatirx(), 3)))
+	if (FAILED(m_pShaderCom->Bind_Matrices("g_CascadeProjMatrix", m_pGameInstance->Get_CascadeProjMatrices(), 3)))
 		return E_FAIL;
 
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_fFar", &m_pGameInstance->Get_Far(), sizeof(_float))))
@@ -1032,7 +1003,7 @@ _bool CPlayer::Calc_DamageGain(_float fAtkDmg, _Vec3 vHitPos, _uint iHitType, _u
 				isHPZero = !Damaged_Guard(fAtkDmg, pSocketBoneMatrix);
 				Decrease_Stamina(fAtkDmg * 0.23f);
 
-				GET_GAMEINTERFACE->Add_Durable_Weapon(-17.f);
+				GET_GAMEINTERFACE->Add_Durable_Weapon(-7.f);
 			}
 		}
 
@@ -1182,6 +1153,7 @@ void CPlayer::Damaged(_float fAtkDmg)
 {
 	_float fFinalDmg = fAtkDmg - (fAtkDmg * ((m_tPlayer_Stat->iStat_Defence + m_tPlayer_Stat_Adjust->iStat_Defence) / 4000.f));
 
+	//fFinalDmg = 0.f;
 	m_tPlayer_Stat->vGauge_Hp.x = max(0.f, m_tPlayer_Stat->vGauge_Hp.x - fFinalDmg);
 
 	if(m_tPlayer_Stat->vGauge_Hp.y - m_tPlayer_Stat->vGauge_Hp.x > 100.f)
@@ -1193,6 +1165,7 @@ _bool CPlayer::Damaged_Guard(_float fAtkDmg, const _Matrix* pSocketBoneMatrix)
 {
 	_float fFinalDmg = fAtkDmg - (fAtkDmg * ((m_tPlayer_Stat->iStat_Defence + m_tPlayer_Stat_Adjust->iStat_Defence) / 4000.f));
 
+	//fFinalDmg = 0.f;
 	m_tPlayer_Stat->vGauge_Hp.x = max(0.f, m_tPlayer_Stat->vGauge_Hp.x - fFinalDmg * 0.15f);
 
 	if (m_tPlayer_Stat->vGauge_Hp.x <= 0.f)
@@ -1249,7 +1222,7 @@ void CPlayer::Change_HitState(_float fAtkDmg, _Vec3 vHitPos, _uint iAttackStreng
 			m_pFsmCom->Change_State(HIT, &HitDesc);
 	}
 
-	m_pEffect_Manager->Add_Effect_ToLayer(LEVEL_GAMEPLAY, TEXT("Player_Impact"), pParetnMatrix, pSocketBoneMatrix);
+	m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 }
 
 void CPlayer::Update_Stat(_float fTimeDelta)
@@ -1263,7 +1236,7 @@ void CPlayer::Update_Stat(_float fTimeDelta)
 	// 회복 아뮬렛
 	if (m_tPlayer_Stat_Adjust->fHeal > 0.f)
 	{
-		Recovery_HP(1.5f * fTimeDelta);
+		Recovery_HP(1.1f * fTimeDelta);
 	}
 
 #pragma region 스테미나
@@ -1320,14 +1293,14 @@ void CPlayer::Update_Stat(_float fTimeDelta)
 	}
 
 	// 불 상태면 지속 데미지
-	if (m_tPlayer_Stat->fDebuff_Fire.x > m_tPlayer_Stat->fDebuff_Fire.y * 0.5f)
+	if (m_tPlayer_Stat->fDebuff_Fire.x > m_tPlayer_Stat->fDebuff_Fire.y * 0.1f)
 	{
 		m_DissolveEffects[DISSOLVE_FIRE]->Set_On(true);
 		Damaged(0.05f);
 	}
 
 	// 전기 상태면 이동 속도 감소
-	if (m_tPlayer_Stat->fDebuff_Electric.x > m_tPlayer_Stat->fDebuff_Electric.y * 0.5f)
+	if (m_tPlayer_Stat->fDebuff_Electric.x > m_tPlayer_Stat->fDebuff_Electric.y * 0.1f)
 	{
 		m_DissolveEffects[DISSOLVE_ELECTRIC]->Set_On(true);
 		m_fDebuffSpeedRatio = 0.8f;
@@ -1339,7 +1312,7 @@ void CPlayer::Update_Stat(_float fTimeDelta)
 	}
 
 	// 독 상태면 일정 시간마다 데미지
-	if (m_tPlayer_Stat->fDebuff_Acid.x > m_tPlayer_Stat->fDebuff_Acid.y * 0.5f)
+	if (m_tPlayer_Stat->fDebuff_Acid.x > m_tPlayer_Stat->fDebuff_Acid.y * 0.1f)
 	{
 		m_DissolveEffects[DISSOLVE_POISON]->Set_On(true);
 		m_fDebuffAcidDamageTime -= fTimeDelta;
@@ -1501,7 +1474,7 @@ void CPlayer::Create_ThrowItem(SPECIAL_ITEM eItemType)
 	if (m_pTargetMonster)
 	{
 		_Vec3 vPlayerPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-		_Vec3 vTargetPos = m_pTargetMonster->Get_Transform()->Get_State(CTransform::STATE_POSITION);
+		_Vec3 vTargetPos = m_pTargetMonster->Calc_CenterPos(); //m_pTargetMonster->Get_Transform()->Get_State(CTransform::STATE_POSITION);
 
 		Desc.vThrowDir = vTargetPos - vPlayerPos;
 	}
@@ -2060,7 +2033,7 @@ HRESULT CPlayer::Ready_Components()
 	physX::GeometryCapsule CapsuleDesc;
 	CapsuleDesc.fHeight = 1.f;
 	CapsuleDesc.fRadius = 0.25f;
-	RigidBodyDesc.pGeometry = &CapsuleDesc;
+	RigidBodyDesc.pGeometryDesc = &CapsuleDesc;
 
 	/* FOR.Com_RigidBody */
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_RigidBody"),
